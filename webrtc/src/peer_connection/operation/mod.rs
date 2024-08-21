@@ -118,7 +118,7 @@ impl Operations {
         loop {
             tokio::select! {
                 _ = close_rx.recv() => {
-                    println!("SHUT IT DOWN!!!!!");
+                    println!("FINAL Shoutdown");
                     break;
                 }
                 result = ops_rx.recv() => {
@@ -145,7 +145,9 @@ impl Operations {
                     println!("Failed to send message: {:?}", e);
                     // You can also log the error, return it, or take other actions depending on your use case
                 }
-            }
+            };
+            println!("SHUT IT DOWN!");
+            self.close_handler.as_ref().expect("REASON").abort();
         };
         Ok(())
     }
