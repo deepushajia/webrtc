@@ -116,21 +116,29 @@ impl Operations {
     ) {
         loop {
             println!("1");
-            tokio::select! {
-                _ = close_rx.recv() => {
-                    println!("FINAL Shoutdown");
-                    break;
+            
+            match close_rx.try_recv() {
+                Ok(_) => {
+                   break;
                 }
-                result = ops_rx.recv() => {
-                    if let Some(mut f) = result {
-                        length.fetch_sub(1, Ordering::SeqCst);
-                        if f.0().await {
-                            // Requeue this operation
-                            let _ = Operations::enqueue_inner(f, &ops_tx, &length);
-                        }
+                Err(e) => {
+                    println!("Some error 1: {:?}", e);
+                }
+            };
+                
+            match ops_rx.try_recv() {
+                Ok(mut f) => {
+                    length.fetch_sub(1, Ordering::SeqCst);
+                    if f.0().await {
+                        // Requeue this operation
+                        let _ = Operations::enqueue_inner(f, &ops_tx, &length);
                     }
-                }
+                 }
+                 Err(e) => {
+                    println!("Some error 2: {:?}", e);
+                 }
             }
+            // }
         }
     }
 
