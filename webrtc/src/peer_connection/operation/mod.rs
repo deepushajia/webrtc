@@ -43,6 +43,7 @@ pub(crate) struct Operations {
     length: Arc<AtomicUsize>,
     ops_tx: Option<Arc<mpsc::UnboundedSender<Operation>>>,
     close_tx: Option<mpsc::Sender<()>>,
+    close_handler: Option<tokio::task::JoinHandle<()>>
 }
 
 impl Operations {
@@ -53,7 +54,7 @@ impl Operations {
         let l = Arc::clone(&length);
         let ops_tx = Arc::new(ops_tx);
         let ops_tx2 = Arc::clone(&ops_tx);
-        tokio::spawn(async move {
+        let close_handler: tokio::task::JoinHandle<()> = tokio::spawn(async move {
             Operations::start(l, ops_tx, ops_rx, close_rx).await;
         });
 
@@ -61,6 +62,7 @@ impl Operations {
             length,
             ops_tx: Some(ops_tx2),
             close_tx: Some(close_tx),
+            close_handler: Some(close_handler)
         }
     }
 
@@ -134,6 +136,7 @@ impl Operations {
     pub(crate) async fn close(&self) -> Result<()> {
         if let Some(close_tx) = &self.close_tx {
             close_tx.send(()).await?;
+            self.close_handler.as_ref().expect("REASON").abort();
         }
         Ok(())
     }
