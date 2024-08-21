@@ -57,7 +57,7 @@ impl Operations {
         let close_handler: tokio::task::JoinHandle<()> = tokio::spawn(async move {
             Operations::start(l, ops_tx, ops_rx, close_rx).await;
         });
-
+        println!("SHUT IT sdasdasd!!!!!");
         Operations {
             length,
             ops_tx: Some(ops_tx2),
@@ -118,7 +118,7 @@ impl Operations {
         loop {
             tokio::select! {
                 _ = close_rx.recv() => {
-                    log::error!("SHUT IT DOWN!!!!!");
+                    println!("SHUT IT DOWN!!!!!");
                     break;
                 }
                 result = ops_rx.recv() => {
@@ -137,6 +137,7 @@ impl Operations {
     pub(crate) async fn close(&self) -> Result<()> {
         if let Some(close_tx) = &self.close_tx {
             close_tx.send(()).await?;
+            println!("SHUT IT DOWN!");
             self.close_handler.as_ref().expect("REASON").abort();
         }
         Ok(())
