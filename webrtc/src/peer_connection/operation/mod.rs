@@ -122,7 +122,6 @@ impl Operations {
                     break;
                 }
                 result = ops_rx.recv() => {
-                    println!("Got something {:?}", result);
                     if let Some(mut f) = result {
                         length.fetch_sub(1, Ordering::SeqCst);
                         if f.0().await {
@@ -137,10 +136,17 @@ impl Operations {
 
     pub(crate) async fn close(&self) -> Result<()> {
         if let Some(close_tx) = &self.close_tx {
-            close_tx.send(()).await?;
-            println!("SHUT IT DOWN!");
-            self.close_handler.as_ref().expect("REASON").abort();
-        }
+            match close_tx.send(()).await {
+                Ok(_) => {
+                    println!("Message sent:");
+                }
+                Err(e) => {
+                    // Handle the error case
+                    println!("Failed to send message: {:?}", e);
+                    // You can also log the error, return it, or take other actions depending on your use case
+                }
+            }
+        };
         Ok(())
     }
 }
