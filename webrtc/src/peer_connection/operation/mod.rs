@@ -136,18 +136,18 @@ impl Operations {
 
     pub(crate) async fn close(&self) -> Result<()> {
         if let Some(close_tx) = &self.close_tx {
-            // match close_tx.send(()).await {
-            //     Ok(_) => {
-            //         println!("Message sent:");
-            //     }
-            //     Err(e) => {
-            //         // Handle the error case
-            //         println!("Failed to send message: {:?}", e);
-            //         // You can also log the error, return it, or take other actions depending on your use case
-            //     }
-            // };
+            match close_tx.send(()).await {
+                Ok(_) => {
+                   let boo =  self.close_handler.as_ref().expect("REASON").is_finished();
+                   println!("Is task finished{}", boo);
+                }
+                Err(e) => {
+                    // Handle the error case
+                    println!("Failed to send message: {:?}", e);
+                    // You can also log the error, return it, or take other actions depending on your use case
+                }
+            };
             println!("SHUT IT DOWN!");
-            self.close_handler.as_ref().expect("REASON").abort();
         };
         Ok(())
     }
