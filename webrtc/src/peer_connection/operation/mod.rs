@@ -118,6 +118,7 @@ impl Operations {
         loop {
             tokio::select! {
                 _ = close_rx.recv() => {
+                    log::error!("SHUT IT DOWN!!!!!");
                     break;
                 }
                 result = ops_rx.recv() => {
