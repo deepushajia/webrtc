@@ -114,15 +114,13 @@ impl Operations {
         mut ops_rx: mpsc::UnboundedReceiver<Operation>,
         mut close_rx: mpsc::Receiver<()>,
     ) {
-        loop {
-            println!("1");
-            
+        loop {            
             match close_rx.try_recv() {
                 Ok(_) => {
                    break;
                 }
                 Err(e) => {
-                    println!("Some error 1: {:?}", e);
+                    // println!("Some error 1: {:?}", e);
                 }
             };
                 
@@ -135,10 +133,10 @@ impl Operations {
                     }
                  }
                  Err(e) => {
-                    println!("Some error 2: {:?}", e);
+                    // println!("Some error 2: {:?}", e);
                  }
             }
-            // }
+            tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
         }
     }
 
