@@ -122,6 +122,7 @@ impl Operations {
                     break;
                 }
                 result = ops_rx.recv() => {
+                    println!("Got something {:?}", result);
                     if let Some(mut f) = result {
                         length.fetch_sub(1, Ordering::SeqCst);
                         if f.0().await {
