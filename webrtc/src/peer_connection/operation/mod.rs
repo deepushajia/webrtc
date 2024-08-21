@@ -57,7 +57,6 @@ impl Operations {
         let close_handler: tokio::task::JoinHandle<()> = tokio::spawn(async move {
             Operations::start(l, ops_tx, ops_rx, close_rx).await;
         });
-        println!("SHUT IT sdasdasd!!!!!");
         Operations {
             length,
             ops_tx: Some(ops_tx2),
@@ -116,6 +115,7 @@ impl Operations {
         mut close_rx: mpsc::Receiver<()>,
     ) {
         loop {
+            println!("1");
             tokio::select! {
                 _ = close_rx.recv() => {
                     println!("FINAL Shoutdown");
@@ -136,16 +136,16 @@ impl Operations {
 
     pub(crate) async fn close(&self) -> Result<()> {
         if let Some(close_tx) = &self.close_tx {
-            match close_tx.send(()).await {
-                Ok(_) => {
-                    println!("Message sent:");
-                }
-                Err(e) => {
-                    // Handle the error case
-                    println!("Failed to send message: {:?}", e);
-                    // You can also log the error, return it, or take other actions depending on your use case
-                }
-            };
+            // match close_tx.send(()).await {
+            //     Ok(_) => {
+            //         println!("Message sent:");
+            //     }
+            //     Err(e) => {
+            //         // Handle the error case
+            //         println!("Failed to send message: {:?}", e);
+            //         // You can also log the error, return it, or take other actions depending on your use case
+            //     }
+            // };
             println!("SHUT IT DOWN!");
             self.close_handler.as_ref().expect("REASON").abort();
         };
