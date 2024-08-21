@@ -222,7 +222,10 @@ impl RTCSctpTransport {
 
         loop {
             let dc = tokio::select! {
-                _ = param.notify_rx.notified() => break,
+                _ = param.notify_rx.notified() => {
+                     println!("Peer connection dc closed");
+                     break;
+                },
                 result = DataChannel::accept(
                     &param.sctp_association,
                     data::data_channel::Config::default(),

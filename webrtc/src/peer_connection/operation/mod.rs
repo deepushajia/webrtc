@@ -139,7 +139,7 @@ impl Operations {
             match close_tx.send(()).await {
                 Ok(_) => {
                    let boo =  self.close_handler.as_ref().expect("REASON").is_finished();
-                   println!("Is task finished{}", boo);
+                   println!("Is task finished {}", boo);
                 }
                 Err(e) => {
                     // Handle the error case
